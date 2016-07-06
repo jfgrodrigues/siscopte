@@ -1,7 +1,7 @@
 function successAuth() {
 	document.getElementById("authMsg").className += 'glyphicon glyphicon-thumbs-up alert alert-success';
 	authMsg.innerHTML="Autenticação realizada com sucesso! Redirecionando..."
-	setTimeout("window.location='../'", 1100);
+	setTimeout("window.location='../'", 900);
 }
 
 function failAuth() {
