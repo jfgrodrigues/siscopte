@@ -17,6 +17,7 @@
 	$usr = mysql_fetch_array($resultado);
 	$profile = $usr["role"];
 	$nome = $usr["name"];
+	$dpto = $usr["dpto"];
 	
 	isset($_GET["action"]) ? $action = $_GET["action"] : $action = "none";
 	
@@ -30,11 +31,6 @@
 		$successMsg = 'role="alert"';
 	else
 		$successMsg = "";
-	
-	$query = "SELECT dpto FROM usuarios WHERE user='$user'";
-	$resultado = mysql_query($query) or die("Erro na query ". mysql_error());
-	$dpto = mysql_fetch_array($resultado);
-	$dpto = $dpto["dpto"];
 ?>
 
 <html lang="pt-br">          
@@ -68,9 +64,9 @@
 			  <ul class="nav navbar-nav">
 				<li class="active"><a href="./">Início <span class="sr-only">(current)</span></a></li>
 			  </ul>
-			  <form class="navbar-form navbar-left" role="search"  method="post" action="?search=true">
+			  <form class="navbar-form navbar-left" role="search" name="search" method="post" action="?search=true">
 				<div class="form-group">
-				  <input type="text" class="form-control" placeholder="Busque pelo patrimônio">
+				  <input type="text" class="form-control" name="search" id="search" placeholder="Busque pelo patrimônio">
 				</div>
 				<button type="submit" class="btn btn-default glyphicon glyphicon-search"> Procurar</button>
 			  </form>
@@ -156,6 +152,44 @@
 		<?php endif ?>
 		</div>
 		<div id="search" class="container">
+		<?php if(isset($_GET["search"]) AND $_GET["search"] == "true"): ?>
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th>Ticket #</th>
+						<th>Solicitante</th>
+						<th>Sentido</th>
+						<th>Tipo Equipamento</th>
+						<th>Patrimonio</th>
+						<th>Técnico Responsável</th>
+						<th>Status</th>
+						<th>Termo de posse CTIC?</th>
+						<th>Termo de posse solicitante?</th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php 
+						$patrimonio_search = $_POST["search"];
+						if ($profile == "admCTIC" OR $profile == "Resp_CTIC"){
+							$query = "SELECT * FROM movimentacoes WHERE patrimonio='$patrimonio_search' ORDER BY id DESC";
+						} elseif ($profile == "Resp_Solicitante") {
+							$query = "SELECT * FROM movimentacoes WHERE patrimonio='$patrimonio_search' AND dpto='$dpto' ORDER BY id DESC";
+						} elseif ($profile == "tecnico") {
+							$query = "SELECT * FROM movimentacoes WHERE patrimonio='$patrimonio_search' AND tecnico='$nome' ORDER BY id DESC";
+						}
+						$resultado = mysql_query($query) or die("Erro na query do select ". mysql_error());
+						while ( $row = mysql_fetch_assoc( $resultado ) ) {
+							$statusRespCTIC = $row["resp_CTIC"];
+							$statusRespCTIC == "0" ? $statusRespCTIC = "Não Confirmado" : $statusRespCTIC = "Confirmado";
+							$statusRespSolicitante = $row["resp_Solicitante"];
+							$statusRespSolicitante == "0" ? $statusRespSolicitante = "Não Confirmado" : $statusRespSolicitante = "Confirmado";
+							echo '<tr><td>'.$row['id'].'</td><td>'.$row['solicitante'].'</td><td>'.$row['sentido'].'</td><td>'.$row['tipo_eqto'].'</td><td>'.$row['patrimonio'].'</td><td>'.$row['tecnico'].'</td><td>'.$row['status'].'</td><td>'.$statusRespCTIC.'</td><td>'.$statusRespSolicitante.'</td></tr>';
+						}
+					?>
+				</tbody>
+			</table>
+			<a href="./" class="glyphicon glyphicon-minus"> Recolher</a>
+		<?php endif ?>
 		</div><br /><br />
 		<?php if($profile == "admCTIC"): ?>
 			<div class="btn-group btn-group-justified" role="group" aria-label="...">
