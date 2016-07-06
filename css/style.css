@@ -1,0 +1,38 @@
+h1 {
+	text-align: center;
+	font-family: 'Orbitron', sans-serif;
+}
+
+h2 {
+	text-align: center;
+	font-family: 'Orbitron', sans-serif;
+}
+
+a {
+	font-family: 'Merriweather Sans', sans-serif;
+}
+
+a.navbar-brand {
+	font-family: 'Orbitron', sans-serif;
+	text-align: center;
+}
+
+
+.jumbotron {
+	width:400px; 
+	padding-top: auto;
+} 
+
+.form-group {
+	padding-top: 10px;
+}
+
+#msg {
+	margin-right: auto;
+	margin-left: auto;
+/*	display: block; */
+}
+
+#disabledInput {
+	text-align: center;
+}
