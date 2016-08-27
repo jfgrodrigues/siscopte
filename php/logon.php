@@ -44,12 +44,18 @@
 					<div class="form-group">
 						<label for="dpto">Departamento</label>
 						<select class="form-control" id="dpto" name="dpto">
+							<option></option>
 							<option>CTIC</option>
-							<option>CJ</option>
-							<option>DRH</option>
+							<?php
+								$query = "SELECT dpto_name FROM dpto ORDER BY dpto_name";
+								$resultado = mysql_query($query) or die("Erro na query do select ". mysql_error());
+								while ( $row = mysql_fetch_assoc( $resultado ) ) {
+									echo '<option>'.$row['dpto_name'].'</option>';
+								}
+							?>
 						</select>
 					</div>
-					<div class="form-group">
+					<div class="form-group" id="perfil" style="display:none">
 						<label for="role"><i>Role</i> (perfil)</label>
 						<select class="form-control" id="role" name="role">
 							<option></option>
@@ -126,6 +132,17 @@
 		}	
 		if(isset($_GET["auth"]) AND $_GET["auth"] == "fail")
 			echo "<script>failAuth()</script>";
+		
+		if(isset($_GET["p"]) AND $_GET["p"] == "cadastrar"){
+			$user = $_POST["user"];
+			$password = $_POST["password"];
+			$role = $_POST["role"];
+			$dpto = $_POST["dpto"];
+			$name = $_POST["nome"];
+			$query = "INSERT INTO usuarios(user, password, role, dpto, name) VALUES('$user', '$password', '$role', '$dpto', '$name')";
+			mysql_query($query) or die("Erro no cadastro ". mysql_error());
+			header("Location: ?cadastro=success&ultInsert=".mysql_insert_id());
+		}
 		?>
 	</body>
 </html>
