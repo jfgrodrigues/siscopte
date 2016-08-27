@@ -316,7 +316,7 @@
 					</div>
 					<div class="form-group">
 						<label for="password">Senha</label>
-						<div class="col-sm-9">
+						<div>
 							<input type="password" class="form-control" id="password" name="password" placeholder="Senha do usuário">
 						</div>
 					</div>
