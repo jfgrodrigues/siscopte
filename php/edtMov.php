@@ -1,13 +1,12 @@
 <?php
-	require_once ("conecta.php");
+	require_once ("config.php");
 	session_start();
 	if (!isset($_SESSION["user"]) || !isset($_SESSION["password"])) {
-		header("Location: logon.html");
+		header("Location: logon.php");
 		exit;
 	}
 	$idMovimentacao = $_POST["idMov"];
 	$tab = "movimentacoes";
-	$banco = "siscopte";
 	mysql_select_db($banco)
 		or die("Erro na selecao do banco ". mysql_error());
 	$query = "SELECT * FROM $tab WHERE id='$idMovimentacao'";
@@ -68,10 +67,10 @@
 			if (isset($_GET["mudar"]) AND $_GET["mudar"] == "true" AND isset($_POST["patrimonio"])) {
 				$patrimonio = $_POST["patrimonio"];
 				$id = $_GET["id"];
-				$update = "UPDATE $tab SET patrimonio = '$patrimonio', status = 'realizando_movimentacao' WHERE id = '$id'";
+				$timestamp = date("Y-m-d H-i-s"); 
+				$update = "UPDATE $tab SET patrimonio = '$patrimonio', status = 'realizando_movimentacao', movimentacao = '$timestamp' WHERE id = '$id'";
 				mysql_query($update) or die ("Erro na atualização da movimentação ".mysql_error());
 				header("Location: ../?edtMov=success&update=$id");
-				exit;
 			}
 		?>
 	</body>

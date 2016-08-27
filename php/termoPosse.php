@@ -1,8 +1,8 @@
 <?php
-	require_once ("conecta.php");
+	require_once ("config.php");
 	session_start();
 	if (!isset($_SESSION["user"]) || !isset($_SESSION["password"])) {
-		header("Location: logon.html");
+		header("Location: logon.php");
 		exit;
 	}
 	isset($_POST["idMov"]) ? $idMovimentacao = $_POST["idMov"] : $idMovimentacao = $_GET["update"];
@@ -82,10 +82,10 @@
 					</div>
 				</div>
 				<br /><br /><center>
-				<div id="msg" <?php echo $failMsg ?>>
+				<div id="msg" <?php echo $failMsg ?>><span id="sinal"></span>
 					<?php
 						if(isset($_GET["termoAssinado"]) AND $_GET["termoAssinado"] == "fail") {
-							echo "<b>Senha não confere! Digite a senha novamente</b>";
+							echo " <b>Senha não confere! Digite-a novamente</b>";
 							echo "<script>assinaturaTermoFail()</script>";
 						}
 					?>
@@ -100,32 +100,32 @@
 			
 		</div>
 		<?php
+			isset($_GET["id"]) ? $id = $_GET["id"] : $id = "";
 			if (isset($_GET["assinar"]) AND $_GET["assinar"] == "true" AND isset($_POST["password"]) AND $_POST["password"] == $_SESSION["password"] AND $user_role == "Resp_CTIC" AND $_GET["sentido"] == "saida_CTIC") {
-				$id = $_GET["id"];
-				$update = "UPDATE $tab SET resp_CTIC = '1', status = 'posse_temporaria_cedida' WHERE id = '$id'";
+				$timestamp = date("Y-m-d H-i-s");
+				$update = "UPDATE $tab SET resp_CTIC = '1', status = 'posse_temporaria_cedida', aprov_ctic = '$timestamp' WHERE id = '$id'";
 				mysql_query($update) or die ("Erro na atualização da movimentação ".mysql_error());
 				header("Location: ../?termoAssinado=success&update=$id");
 				exit;
 			} elseif (isset($_GET["assinar"]) AND $_GET["assinar"] == "true" AND isset($_POST["password"]) AND $_POST["password"] == $_SESSION["password"] AND $user_role == "Resp_Solicitante" AND $_GET["sentido"] == "saida_CTIC") {
-				$id = $_GET["id"];
-				$update = "UPDATE $tab SET resp_Solicitante = '1', status = 'posse_temporaria_transferida' WHERE id = '$id'";
+				$timestamp = date("Y-m-d H-i-s");
+				$update = "UPDATE $tab SET resp_Solicitante = '1', status = 'posse_temporaria_transferida', aprov_solicitante = '$timestamp' WHERE id = '$id'";
 				mysql_query($update) or die ("Erro na atualização da movimentação ".mysql_error());
 				header("Location: ../?termoAssinado=success&update=$id");
 				exit;
 			} elseif (isset($_GET["assinar"]) AND $_GET["assinar"] == "true" AND isset($_POST["password"]) AND $_POST["password"] == $_SESSION["password"] AND $user_role == "Resp_CTIC" AND $_GET["sentido"] == "entrada_CTIC") {
-				$id = $_GET["id"];
-				$update = "UPDATE $tab SET resp_CTIC = '1', status = 'posse_temporaria_restabelecida' WHERE id = '$id'";
+				$timestamp = date("Y-m-d H-i-s");
+				$update = "UPDATE $tab SET resp_CTIC = '1', status = 'posse_temporaria_restabelecida', aprov_ctic = '$timestamp' WHERE id = '$id'";
 				mysql_query($update) or die ("Erro na atualização da movimentação ".mysql_error());
 				header("Location: ../?termoAssinado=success&update=$id");
 				exit;
 			} elseif (isset($_GET["assinar"]) AND $_GET["assinar"] == "true" AND isset($_POST["password"]) AND $_POST["password"] == $_SESSION["password"] AND $user_role == "Resp_Solicitante" AND $_GET["sentido"] == "entrada_CTIC") {
-				$id = $_GET["id"];
-				$update = "UPDATE $tab SET resp_Solicitante = '1', status = 'posse_temporaria_devolvida' WHERE id = '$id'";
+				$timestamp = date("Y-m-d H-i-s");
+				$update = "UPDATE $tab SET resp_Solicitante = '1', status = 'posse_temporaria_devolvida', aprov_solicitante = '$timestamp' WHERE id = '$id'";
 				mysql_query($update) or die ("Erro na atualização da movimentação ".mysql_error());
 				header("Location: ../?termoAssinado=success&update=$id");
 				exit;
 			} elseif (isset($_GET["assinar"]) AND $_GET["assinar"] == "true" AND isset($_POST["password"]) AND $_POST["password"] != $_SESSION["password"]) {
-				$id = $_GET["id"];
 				header("Location: ?termoAssinado=fail&update=$id");
 			}
 		?>

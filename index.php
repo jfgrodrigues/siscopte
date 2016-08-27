@@ -1,16 +1,12 @@
 <?php
-	require_once ("./php/conecta.php");
+	require_once ("./php/config.php");
+	require_once ("./php/cria_tabela.php");
 	session_start();
 	if (!isset($_SESSION["user"]) || !isset($_SESSION["password"])) {
 		header("Location: php/logon.php");
-		exit;
 	}
 	$user = $_SESSION["user"];
 	$tab = "usuarios";
-	$banco = "siscopte";
-	mysql_select_db($banco)
-		or die("Erro na selecao do banco ". mysql_error());
-	
 	$query = "SELECT * FROM $tab WHERE user = '$user'";
 	$resultado = mysql_query($query)
 				or die ("Erro na query ". mysql_error());
@@ -20,7 +16,6 @@
 	$dpto = $usr["dpto"];
 	
 	isset($_GET["action"]) ? $action = $_GET["action"] : $action = "none";
-	
 	isset($statusEntrada) ? $statusEntrada = $statusEntrada : $statusEntrada = "";
 	isset($statusSaida) ? $statusSaida = $statusSaida : $statusSaida = "";
 	isset($_GET["regMov"]) ? $regMov = $_GET["regMov"] : $regMov = "";
@@ -63,17 +58,15 @@
 			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 			  <ul class="nav navbar-nav">
 				<li class="active"><a href="./">Início <span class="sr-only">(current)</span></a></li>
+				<form class="navbar-form navbar-left" role="search" name="search" method="post" action="?search=true">
+					<input type="text" class="form-control" name="search" id="search" placeholder="Busque pelo patrimônio">
+					<button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span> Procurar</button>
+				</form>
 			  </ul>
-			  <form class="navbar-form navbar-left" role="search" name="search" method="post" action="?search=true">
-				<div class="form-group">
-				  <input type="text" class="form-control" name="search" id="search" placeholder="Busque pelo patrimônio">
-				</div>
-				<button type="submit" class="btn btn-default glyphicon glyphicon-search"> Procurar</button>
-			  </form>
 			  <ul class="nav navbar-nav navbar-right">
 				<li><a href="?about=profile-<?php echo $profile ?>">Perfil: <?php echo $profile ?></a></li>
 				<li class="dropdown">
-				  <a href="#" class="dropdown-toggle glyphicon glyphicon-user" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> <?php echo $user ?> <span class="caret"></span></a>
+				  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-user"></span> <?php echo $user ?><span class="caret"></span></a>
 				  <ul class="dropdown-menu">
 					<li class="disabled"><a href="?action=changePassword">Alterar Senha</a></li>
 					<li><a href="?about=SisCoPTE">Sobre o <i>SisCoPTE</i></a></li>
@@ -86,7 +79,8 @@
 			</div>
 		  </div>
 		</nav>
-	</div>
+		
+	</div><br />
 	<div class="container">	
 		<h1>SisCoPTE</h1><br />
 		<h2>Bem vindo(a), <?php echo $nome ?>!</h2>
@@ -106,31 +100,31 @@
 			</ul>
 			<p>A interface busca ser simples, objetiva, fácil de aprender a usar e entender, dando feedback ao usuário (de sucesso ou erro) a cada ação tomada e mostrando apenas elementos essenciais.</p>
 			<p>O sistema foi desenvolvido e lançado com código-aberto, sob a <a href="">licença MIT</a>. O código-fonte pode ser consultado e baixado <a href="https://github.com/jfgrodrigues/siscopte" target="_blank">aqui</a>. Esta versão alpha não inclui os códigos de criação das bases de dados.</p>
-			<a href="./" class="glyphicon glyphicon-minus"> Recolher</a>
+			<a href="./"><span class="glyphicon glyphicon-minus"></span> Recolher</a>
 		<?php elseif (isset($_GET["about"]) AND $_GET["about"] == "profile-admCTIC"): ?>
 			<h3><b>Sobre o perfil <i>admCTIC</i></b></h3>
 			<p>É o único perfil que consegue visualizar todas as movimentações em todos os <i>status</i>. Também é o único que consegue criar novos usuários, redefinir senha de outros usuários, cadastrar equipamentos, ou seja, é o perfil que possui funções administrativas no sistema, apesar de que nesta primeira versão, apenas as funções essenciais para registro de movimentações foram incluídas.</p>
 			<p>A navegação é muito simples: na barra superior pode-se realizar busca das movimentações registradas pelo número de patrimônio (à esquerda), e à direita pode-ser ver o perfil do usuário conectado e encontrar os botões para fazer <i>logoff</i> e informações de <a href="?about=license">licenciamento</a> e <a href="?about=SisCoPTE">sobre o sistema</a>.</p>
 			<p>Abaixo, após a saudação de boas vindas, o usuário encontra uma lista de botões com cada tarefa a fazer: registrar movimentação, cadastrar usuário e cadastrar equipamento. Nesta versão, apenas a função "registrar movimentação" se encontra habilitada. Clicando no botão, é aberto um formulário para a execução da tarefa. abaixo disso, há um grid onde é possível visualizar as moviemntações registradas, separadas entre entrada / saída do departamento de TI.</p>
-			<a href="./" class="glyphicon glyphicon-minus"> Recolher</a>
+			<a href="./"><span class="glyphicon glyphicon-minus"></span> Recolher</a>
 		<?php elseif (isset($_GET["about"]) AND $_GET["about"] == "profile-tecnico"): ?>
 			<h3><b>Sobre o perfil <i>tecnico</i></b></h3>
 			<p>Este perfil consegue visualizar todas as movimentações a realizar atribuídas ao seu usuário pelo <i>admCTIC</i>, e assinalar que as realiza.</p>
 			<p>A navegação é muito simples: na barra superior pode-se realizar busca das movimentações realizadas pelo número de patrimônio (à esquerda), e à direita pode-ser ver o perfil do usuário conectado e encontrar os botões para fazer <i>logoff</i> e informações de <a href="?about=license">licenciamento</a> e <a href="?about=SisCoPTE">sobre o sistema</a>.</p>
 			<p>Abaixo, após a saudação de boas vindas, o usuário encontra uma lista de movimentações a realizar, separadas entre entrada / saída do departamento de TI.</p>
-			<a href="./" class="glyphicon glyphicon-minus"> Recolher</a>
+			<a href="./"><span class="glyphicon glyphicon-minus"></span> Recolher</a>
 		<?php elseif (isset($_GET["about"]) AND $_GET["about"] == "profile-Resp_Solicitante"): ?>
 			<h3><b>Sobre o perfil <i>Resp_Solicitante</i></b></h3>
 			<p>Este perfil consegue visualizar todas as movimentações que necessitam de assinatura do termo de posse, assinando eletronicamente esses termos.</p>
 			<p>A navegação é muito simples: na barra superior pode-se realizar busca das movimentações de seu departamento pelo número de patrimônio (à esquerda), e à direita pode-ser ver o perfil do usuário conectado e encontrar os botões para fazer <i>logoff</i> e informações de <a href="?about=license">licenciamento</a> e <a href="?about=SisCoPTE">sobre o sistema</a>.</p>
 			<p>Abaixo, após a saudação de boas vindas, o usuário encontra um grid com os termos a serem assinados, separadas entre equipamentos solicitados / devolvidos ao departamento de TI.</p>
-			<a href="./" class="glyphicon glyphicon-minus"> Recolher</a>
+			<a href="./"><span class="glyphicon glyphicon-minus"></span> Recolher</a>
 		<?php elseif (isset($_GET["about"]) AND $_GET["about"] == "profile-Resp_CTIC"): ?>
 			<h3><b>Sobre o perfil <i>Resp_CTIC</i></b></h3>
 			<p>Este perfil visualiza e assina eletronicamente os termos de posse (concessão e recebimento) de todas as movimentações enquanto estão "em aberto".</p>
 			<p>A navegação é muito simples: na barra superior pode-se realizar busca das movimentações de seu departamento pelo número de patrimônio (à esquerda), e à direita pode-ser ver o perfil do usuário conectado e encontrar os botões para fazer <i>logoff</i> e informações de <a href="?about=license">licenciamento</a> e <a href="?about=SisCoPTE">sobre o sistema</a>.</p>
 			<p>Abaixo, após a saudação de boas vindas, o usuário encontra um grid com os termos a serem assinados, separadas entre equipamentos que entram / saem ao departamento de TI.</p>
-			<a href="./" class="glyphicon glyphicon-minus"> Recolher</a>
+			<a href="./"><span class="glyphicon glyphicon-minus"></span> Recolher</a>
 		<?php elseif (isset($_GET["about"]) AND $_GET["about"] == "license"): ?>
 			<h3><b>The MIT License (MIT)</b></h3><br />
 			<p>Copyright (c) 2016 Jean F. G. Rodrigues</p><br />
@@ -148,7 +142,7 @@
 				COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 				IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 				CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
-			<a href="./" class="glyphicon glyphicon-minus"> Recolher</a>
+			<a href="./"><span class="glyphicon glyphicon-minus"></span> Recolher</a>
 		<?php endif ?>
 		</div>
 		<div id="search" class="container">
@@ -188,28 +182,64 @@
 					?>
 				</tbody>
 			</table>
-			<a href="./" class="glyphicon glyphicon-minus"> Recolher</a>
+			<a href="./"><span class="glyphicon glyphicon-minus"></span> Recolher</a>
 		<?php endif ?>
 		</div><br /><br />
 		<?php if($profile == "admCTIC"): ?>
+		<center><div id="authMsg"><span id="sinal"></span>
+				<?php
+					if(isset($_GET["cadastro"]) AND $_GET["cadastro"] == "success"){
+						echo "<script>successCadastro()</script>";
+						$id = $_GET["ultInsert"];
+						if($_GET["cad"] == "user"){
+							$query = "SELECT * FROM usuarios WHERE id = '$id'";
+							$resultado = mysql_query($query) or die("Erro na busca de verificação da última inserção ". mysql_error());
+							$usr = mysql_fetch_array($resultado);
+							echo " Login do <b>".$usr["name"]."</b>, criado com sucesso!!!<br />Usuário: <b>".$usr["user"]."</b><br />senha: <b>".$usr["password"];
+						} elseif($_GET["cad"] == "dpto"){
+							$query = "SELECT dpto_name FROM dpto WHERE id = '$id'";
+							$resultado = mysql_query($query) or die("Erro na busca de verificação da última inserção ". mysql_error());
+							$dpto = mysql_fetch_array($resultado);
+							echo " Departamento <b>".$dpto["dpto_name"]."</b> cadastrado com sucesso!!!";
+						} elseif($_GET["cad"] == "tipo_eqto"){
+							$query = "SELECT tipo_nome FROM tipo_eqto WHERE id = '$id'";
+							$resultado = mysql_query($query) or die("Erro na busca de verificação da última inserção ". mysql_error());
+							$tp_eqto = mysql_fetch_array($resultado);
+							echo " Tipo de equipamento <b>".$tp_eqto["tipo_nome"]."</b> cadastrado com sucesso!!!";
+						} elseif($_GET["cad"] == "eqto"){
+							$query = "SELECT * FROM equipamentos WHERE id = '$id'";
+							$resultado = mysql_query($query) or die("Erro na busca de verificação da última inserção ". mysql_error());
+							$eqto = mysql_fetch_array($resultado);
+							echo " <b>".$eqto["tipo"]."</b> patrimônio <b>".$eqto["patrimonio"]."</b>, service tag <b>".$eqto["service_tag"]."</b> cadastrado com sucesso!!!";
+						}
+					}
+				?>
+				</div></center>
+
 			<div class="btn-group btn-group-justified" role="group" aria-label="...">
 			  <div class="btn-group" role="group">
-				<a type="button" class="btn btn-primary btn-lg" href="?action=regMov">Registrar Movimentação</a>
+				<a type="button" class="btn btn-primary btn-lg" href="?action=regMov">Movimentação</a>
 			  </div>
 			  <div class="btn-group" role="group">
-				<a type="button" class="btn btn-primary btn-lg" href="?action=regUsr" disabled="disabled">Cadastrar Usuário</a>
+				<a type="button" class="btn btn-primary btn-lg" href="?action=regUsr">Usuários</a>
 			  </div>
 			  <div class="btn-group" role="group">
-				<a type="button" class="btn btn-primary btn-lg" href="?action=regEqt" disabled="disabled">Cadastrar Equipamento</a>
+				<a type="button" class="btn btn-primary btn-lg" href="?action=regEqt">Equipamentos</a>
+			  </div>
+			  <div class="btn-group" role="group">
+				<a type="button" class="btn btn-primary btn-lg" href="?action=regTipoEqt">Tipo de Equipamento</a>
+			  </div>
+			  <div class="btn-group" role="group">
+				<a type="button" class="btn btn-primary btn-lg" href="?action=regDpto">Departamentos</a>
 			  </div>
 			</div> <br /> <center>
-			<div id="msg" <?php echo $success?>>
+			<div id="msg" <?php echo $success?>><span id="sinal"></span>
 				<?php 
 					if ($regMov == "success") {
 						$query = "SELECT * FROM movimentacoes WHERE id='$ultimoInsert'";
 						$resultado = mysql_query($query) or die("Erro na query ".mysql_error());
 						$ultimoInsert = mysql_fetch_array($resultado);
-						echo "<b>Movimentação registrada com sucesso!</b><br />Dados: Ticket #: <b>".$ultimoInsert["id"]."</b><br />Tipo de Equipamento: <b>".$ultimoInsert["tipo_eqto"]."</b><br />Solicitante: <b>".$ultimoInsert["solicitante"]."</b><br />Sentido: <b>".$ultimoInsert["sentido"]."</b>";
+						echo "<span class='glyphicon glyphicon-ok'></span> <b>Movimentação registrada com sucesso!</b><br />Dados: Ticket #: <b>".$ultimoInsert["id"]."</b><br />Tipo de Equipamento: <b>".$ultimoInsert["tipo_eqto"]."</b><br />Solicitante: <b>".$ultimoInsert["solicitante"]."</b><br />Sentido: <b>".$ultimoInsert["sentido"]."</b><br />Horario: <b>".$ultimoInsert["criacao"]."</b>";
 					}
 				
 				?>
@@ -221,7 +251,7 @@
 			?>
 	<?php if ($action != "none") echo '<div class="container jumbotron">'; ?>
 			<?php if ($action == "regMov"): ?>
-			<form name="regMov" method="post" action="./php/regMov.php" onsubmit="return chkRegMov();">
+			<form name="regMov" method="post" action="./php/regMov.php">
 				<div class="form-group">
 					<input type="radio" name="sentido" value="entrada_CTIC" checked> Entrada CTIC<br />
 					<input type="radio" name="sentido" value="saida_CTIC"> Saida CTIC
@@ -244,10 +274,10 @@
 					<select name="eqto-type">
 						<option value=""></option>
 						<?php
-							$query = "SELECT tipo_name FROM tipo_eqto ORDER BY id";
+							$query = "SELECT tipo_nome FROM tipo_eqto ORDER BY tipo_nome";
 							$resultado = mysql_query($query) or die("Erro na query do select ". mysql_error());
 							while ($row = mysql_fetch_assoc($resultado)) {
-								echo '<option value="'.$row['tipo_name'].'">'.$row['tipo_name'].'</option>';
+								echo '<option>'.$row['tipo_nome'].'</option>';
 							}
 						?>	
 					</select>
@@ -260,7 +290,7 @@
 							$query = "SELECT name FROM usuarios WHERE role='tecnico' ORDER BY name";
 							$resultado = mysql_query($query) or die("Erro na query do select ". mysql_error());
 							while ($row = mysql_fetch_assoc($resultado)) {
-								echo '<option value="'.$row['name'].'">'.$row['name'].'</option>';
+								echo '<option>'.$row['name'].'</option>';
 							}
 						?>	
 					</select>
@@ -271,12 +301,114 @@
 				<div id="errMsg"></div>
 			</form>
 			<?php elseif ($action == "regUsr"): ?>
-			<form name="regUsr" method="post" action="php/logon.php">
-			</form>
+				<form name="cadastrar" id="cadastrar" method="post" action="./php/cadastrar.php?cad=user">
+					<div class="form-group">
+						<label for="nome">Nome</label>
+						<div>
+							<input type="text" class="form-control" id="nome" name="nome" placeholder="Nome do usuário">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="user">Usuário</label>
+						<div>
+							<input type="text" class="form-control" id="usr" name="user" placeholder="Login no sistema">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="password">Senha</label>
+						<div class="col-sm-9">
+							<input type="password" class="form-control" id="password" name="password" placeholder="Senha do usuário">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="dpto">Departamento</label>
+						<select class="form-control" id="dpto" name="dpto">
+							<option></option>
+							<?php
+								$query = "SELECT dpto_name FROM dpto ORDER BY dpto_name";
+								$resultado = mysql_query($query) or die("Erro na query do select ". mysql_error());
+								while ( $row = mysql_fetch_assoc( $resultado ) ) {
+									echo '<option>'.$row['dpto_name'].'</option>';
+								}
+							?>
+						</select>
+					</div>
+					<div class="form-group" id="perfil" style="display:none">
+						<label for="role"><i>Role</i> (perfil)</label>
+						<select class="form-control" id="role" name="role">
+							<option></option>
+							<option id="admCTIC">admCTIC</option>
+							<option id="Resp_CTIC">Resp_CTIC</option>
+							<option id="tecnico">tecnico</option>
+							<option id="Resp_Solicitante" style="display:none">Resp_Solicitante</option>
+							<option id="usuario">usuario</option>
+						</select>
+					</div>
+					<div id="chkUser"></div>
+					<div class="form-group">
+						<center><button type="submit" class="btn btn-primary form-control" id="btn_cadastrar">Cadastrar</button></center>
+					</div>
+				</form>
+				<center><a role="button" class="btn btn-danger form-control" href="./" id="btn_voltar">Voltar</a></center>
 			
 			<?php elseif ($action == "regEqt"): ?>
-			<form name="regEqt" method="post" action="php/logon.php">
-			</form>
+				<form name="cadastrar" id="cadastrar" method="post" action="./php/cadastrar.php?cad=eqto">
+					<div class="form-group">
+						<label for="tipo_eqto">Tipo de equipamento</label>
+						<select name="tipo_eqto">
+							<option value=""></option>
+							<?php
+								$query = "SELECT tipo_nome FROM tipo_eqto ORDER BY tipo_nome";
+								$resultado = mysql_query($query) or die("Erro na query do select ". mysql_error());
+								while ($row = mysql_fetch_assoc($resultado)) {
+									echo '<option>'.$row['tipo_nome'].'</option>';
+								}
+							?>	
+						</select>
+					</div>
+					<div class="form-group">
+						<center><label for="dpto">Patrimônio</label></center><br />
+						<div>
+							<input type="text" class="form-control" id="patrimonio" name="patrimonio" placeholder="Código de patrimônio">
+						</div>
+					</div>
+					<div class="form-group">
+						<center><label for="service_tag">Service Tag</label></center><br />
+						<div>
+							<input type="text" class="form-control" id="service_tag" name="service_tag" placeholder="Service Tag (código do fabricante)">
+						</div>
+					</div>
+					
+					<div class="form-group">
+						<button type="submit" class="btn btn-primary form-control" id="btn_cadastrar">Cadastrar</button>
+					</div>
+				</form>
+
+			<?php elseif ($action == "regTipoEqt"): ?>
+				<form name="cadastrar" id="cadastrar" method="post" action="./php/cadastrar.php?cad=tp_eqto">
+					<div class="form-group">
+						<center><label for="tipo_eqto">Tipo de Equipamento</label></center>
+						<div>
+							<input type="text" class="form-control" id="tipo_eqto" name="tipo_eqto" placeholder="Tipo de Equipamento">
+						</div>
+					</div>
+					<div class="form-group">
+						<button type="submit" class="btn btn-primary form-control" id="btn_cadastrar">Cadastrar</button>
+					</div>
+				</form>
+		
+			<?php elseif ($action == "regDpto"): ?>
+				<form name="cadastrar" id="cadastrar" method="post" action="./php/cadastrar.php?cad=dpto">
+					<div class="form-group">
+						<center><label for="dpto">Departamento</label></center>
+						<div>
+							<input type="text" class="form-control" id="dpto" name="dpto" placeholder="Nome do departamento">
+						</div>
+					</div>
+					<div class="form-group">
+						<button type="submit" class="btn btn-primary form-control" id="btn_cadastrar">Cadastrar</button>
+					</div>
+				</form>
 			<?php endif ?>
 			</div><br />
 			<h2>Movimentações</h2>
@@ -325,11 +457,11 @@
 			
 		<?php elseif($profile == "tecnico"): ?>
 			<h2>Movimentações a fazer:</h2>
-			<center><div id="msg" <?php echo $successMsg ?>>
+			<center><div id="msg" <?php echo $successMsg ?>><span id="sinal"></span>
 				<?php
 					if(isset($_GET["edtMov"]) AND $_GET["edtMov"] == "success") {
 						$id = $_GET["update"];
-						echo "<b>Movimentação #$id assinalada com sucesso!</b>";
+						echo " <b>Movimentação #$id assinalada com sucesso!</b>";
 						echo "<script>assinaturaTermoSuccess()</script>";
 					}
 					?>
@@ -347,7 +479,7 @@
 				<div class="form-group">
 					<input type="radio" name="sentido" value="entrada_CTIC" <?php echo $statusEntrada ?>> Entrada CTIC
 					<input type="radio" name="sentido" value="saida_CTIC" <?php echo $statusSaida ?>> Saida CTIC
-					<button type="submit" class="btn btn-info glyphicon glyphicon-refresh" class="form-control"> Pesquisar</button>
+					<button type="submit" class="btn btn-info" class="form-control"><span class="glyphicon glyphicon-refresh"></span> Pesquisar</button>
 				</div>
 			</form></center>
 			<table class="table table-striped">
@@ -375,7 +507,7 @@
 						$statusRespCTIC == "0" ? $statusRespCTIC = "Não Confirmado" : $statusRespCTIC = "Confirmado";
 						$statusRespSolicitante = $row["resp_Solicitante"];
 						$statusRespSolicitante == "0" ? $statusRespSolicitante = "Não Confirmado" : $statusRespSolicitante = "Confirmado";
-						echo '<tr><td><form method="post" action="php/edtMov.php"><input type="radio" name="idMov" value="'.$row['id'].'" checked> '.$row['id'].'</td>'.'<td>'.$row['solicitante'].'</td><td>'.$row['tipo_eqto'].'</td><td>'.$row['patrimonio'].'</td><td>'.$row['tecnico'].'</td><td>'.$row['status'].'</td><td>'.$statusRespCTIC.'</td><td>'.$statusRespSolicitante.'</td><td>'.'<button type="submit" class="btn btn-default form-control glyphicon glyphicon-pencil"> Fazer movimentação</button></form>'.'</td></tr>';
+						echo '<tr><td><form method="post" action="php/edtMov.php"><input type="radio" name="idMov" value="'.$row['id'].'" checked> '.$row['id'].'</td>'.'<td>'.$row['solicitante'].'</td><td>'.$row['tipo_eqto'].'</td><td>'.$row['patrimonio'].'</td><td>'.$row['tecnico'].'</td><td>'.$row['status'].'</td><td>'.$statusRespCTIC.'</td><td>'.$statusRespSolicitante.'</td><td>'.'<button type="submit" class="btn btn-default form-control"><span class="glyphicon glyphicon-pencil"></span> Fazer movimentação</button></form></td></tr>';
 					}
 				?>
 				</tbody>
@@ -383,11 +515,11 @@
 			
 		<?php elseif($profile == "Resp_CTIC"): ?>
 			<h2>Termos de Posse:</h2>
-				<center><div id="msg" <?php echo $successMsg ?>>
+				<center><div id="msg" <?php echo $successMsg ?>><span id="sinal"></span>
 				<?php
 					if(isset($_GET["termoAssinado"]) AND $_GET["termoAssinado"] == "success") {
 						$id = $_GET["update"];
-						echo "<b>Termo da movimentação #$id assinado com sucesso!</b>";
+						echo " <b>Termo da movimentação #$id assinado com sucesso!</b>";
 						echo "<script>assinaturaTermoSuccess()</script>";
 					}
 					?>
@@ -405,7 +537,7 @@
 				<div class="form-group">
 					<input type="radio" name="sentido" value="entrada_CTIC" <?php echo $statusEntrada ?>> Equipamentos que entram no CTIC
 					<input type="radio" name="sentido" value="saida_CTIC" <?php echo $statusSaida ?>> Equipamentos que saem do CTIC
-					<button type="submit" class="btn btn-info glyphicon glyphicon-refresh" class="form-control"> Pesquisar</button>
+					<button type="submit" class="btn btn-info" class="form-control"><span class="glyphicon glyphicon-refresh"></span> Pesquisar</button>
 				</div>
 			</form></center>
 			<table class="table table-striped">
@@ -433,7 +565,7 @@
 						$statusRespCTIC == "0" ? $statusRespCTIC = "Não Confirmado" : $statusRespCTIC = "Confirmado";
 						$statusRespSolicitante = $row["resp_Solicitante"];
 						$statusRespSolicitante == "0" ? $statusRespSolicitante = "Não Confirmado" : $statusRespSolicitante = "Confirmado";
-						echo '<tr><td><form method="post" action="php/termoPosse.php"><input type="radio" name="idMov" value="'.$row['id'].'" checked> '.$row['id'].'</td>'.'<td>'.$row['solicitante'].'</td><td>'.$row['tipo_eqto'].'</td><td>'.$row['patrimonio'].'</td><td>'.$row['tecnico'].'</td><td>'.$row['status'].'</td><td>'.$statusRespCTIC.'</td><td>'.$statusRespSolicitante.'</td><td>'.'<button type="submit" class="btn btn-info form-control glyphicon glyphicon-pencil"> Termo de Posse</button></form>'.'</td></tr>';
+						echo '<tr><td><form method="post" action="php/termoPosse.php"><input type="radio" name="idMov" value="'.$row['id'].'" checked> '.$row['id'].'</td>'.'<td>'.$row['solicitante'].'</td><td>'.$row['tipo_eqto'].'</td><td>'.$row['patrimonio'].'</td><td>'.$row['tecnico'].'</td><td>'.$row['status'].'</td><td>'.$statusRespCTIC.'</td><td>'.$statusRespSolicitante.'</td><td>'.'<button type="submit" class="btn btn-info form-control"><span class="glyphicon glyphicon-pencil"></span> Termo de Posse</button></form></td></tr>';
 					}
 				?>
 				</tbody>
@@ -441,11 +573,11 @@
 		
 		<?php elseif($profile == "Resp_Solicitante"): ?>
 			<h2>Termos de Posse:</h2>
-				<center><div id="msg" <?php echo $successMsg ?>>
+				<center><div id="msg" <?php echo $successMsg ?>><span id="sinal"></span>
 				<?php
 					if(isset($_GET["termoAssinado"]) AND $_GET["termoAssinado"] == "success") {
 						$id = $_GET["update"];
-						echo "<b>Termo da movimentação #$id assinado com sucesso!</b>";
+						echo " <b>Termo da movimentação #$id assinado com sucesso!</b>";
 						echo "<script>assinaturaTermoSuccess()</script>";
 					}
 					?>
@@ -463,7 +595,7 @@
 				<div class="form-group">
 					<input type="radio" name="sentido" value="entrada_CTIC" <?php echo $statusEntrada ?>> Equipamentos devolvidos
 					<input type="radio" name="sentido" value="saida_CTIC" <?php echo $statusSaida ?>> Equipamentos solicitados
-					<button type="submit" class="btn btn-info glyphicon glyphicon-refresh" class="form-control"> Pesquisar</button>
+					<button type="submit" class="btn btn-info" class="form-control"><span class="glyphicon glyphicon-refresh"></span> Pesquisar</button>
 				</div>
 			</form></center>
 			<table class="table table-striped">
@@ -488,7 +620,7 @@
 						$statusRespCTIC == "0" ? $statusRespCTIC = "Não Confirmado" : $statusRespCTIC = "Confirmado";
 						$statusRespSolicitante = $row["resp_Solicitante"];
 						$statusRespSolicitante == "0" ? $statusRespSolicitante = "Não Confirmado" : $statusRespSolicitante = "Confirmado";
-						echo '<tr><td><form method="post" action="php/termoPosse.php"><input type="radio" name="idMov" value="'.$row['id'].'" checked> '.$row['id'].'</td>'.'<td>'.$row['solicitante'].'</td><td>'.$row['tipo_eqto'].'</td><td>'.$row['patrimonio'].'</td><td>'.$row['tecnico'].'</td><td>'.$row['status'].'</td><td>'.$statusRespCTIC.'</td><td>'.$statusRespSolicitante.'</td><td>'.'<button type="submit" class="btn btn-info form-control glyphicon glyphicon-pencil"> Termo de Posse</button></form>'.'</td></tr>';
+						echo '<tr><td><form method="post" action="php/termoPosse.php"><input type="radio" name="idMov" value="'.$row['id'].'" checked> '.$row['id'].'</td>'.'<td>'.$row['solicitante'].'</td><td>'.$row['tipo_eqto'].'</td><td>'.$row['patrimonio'].'</td><td>'.$row['tecnico'].'</td><td>'.$row['status'].'</td><td>'.$statusRespCTIC.'</td><td>'.$statusRespSolicitante.'</td><td>'.'<button type="submit" class="btn btn-info form-control"><span class="glyphicon glyphicon-pencil"></span> Termo de Posse</button></form></td></tr>';
 					}
 				?>
 				</tbody>
@@ -498,3 +630,5 @@
 	</div>
 	</body>
 </html>
+
+
