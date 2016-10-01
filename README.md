@@ -8,12 +8,12 @@ Antes de mais nada, é pré-requisitos para fazer a implementação e configura�
 
 Com os pré-requisitos atendidos, basta baixar os arquivos-fonte e copiá-los para a pasta do servidor web onde o serviço irá rodar. Depois disso, basta abrir o arquivo 'config.php' na pasta '/php' e inserir as informações de acesso ao banco de dados. Abaixo o arquivo 'config' e a informação que deve ser preenchida em cada campo:
 
-```shell
+```php
 <?php
-	$host = ""; -> inserir a informação do host onde o banco está instalado (ex.: localhost)
-	$user = ""; -> inserir o usuário no banco de dados 
-	$pass = ""; -> inserir a senha do usuário no banco de dados
-	$banco = ""; -> inserir o nome do banco de dados (ex.: siscopte)
+	$host = ""; // inserir a informação do host onde o banco está instalado (ex.: localhost)
+	$user = ""; // inserir o usuário no banco de dados 
+	$pass = ""; // inserir a senha do usuário no banco de dados
+	$banco = ""; // inserir o nome do banco de dados (ex.: siscopte)
 	$link=@mysql_connect($host, $user, $pass)
 		or die("Erro de conexão ".mysql_error());
 	mysql_select_db($banco)
