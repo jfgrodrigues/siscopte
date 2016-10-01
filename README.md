@@ -10,10 +10,10 @@ Com os pré-requisitos atendidos, basta baixar os arquivos-fonte e copiá-los pa
 
 ```shell
 <?php
-	$host = ""; // inserir a informação do host onde o banco está instalado (ex.: localhost)
-	$user = ""; // inserir o usuário no banco de dados 
-	$pass = ""; // inserir a senha do usuário no banco de dados
-	$banco = ""; // inserir o nome do banco de dados (ex.: siscopte)
+	$host = ""; -> inserir a informação do host onde o banco está instalado (ex.: localhost)
+	$user = ""; -> inserir o usuário no banco de dados 
+	$pass = ""; -> inserir a senha do usuário no banco de dados
+	$banco = ""; -> inserir o nome do banco de dados (ex.: siscopte)
 	$link=@mysql_connect($host, $user, $pass)
 		or die("Erro de conexão ".mysql_error());
 	mysql_select_db($banco)
@@ -26,4 +26,4 @@ Depois disso, basta começar a usar o sistema.
 Obs.: A versão baixada virá com um botão "cadastrar" na página inicial para que o primeiro usuário possa ser cadastrado. Esse botão permanecerá posteriormente se não for alterado o código-fonte do sistema por quem for administrá-lo.
 
 ## Versão de Teste Online
-O sistema pode ser acessado e testado online no endereço http://siscopte.byethost7.com/. Nessa versão de teste, é possível criar um usuário de teste na página inicial em qualquer perfil e fazer o acesso e validar cada funcionalidade.
+O sistema pode ser acessado e testado online no endereço http://siscopte.byethost7.com/. Nessa versão, é possível criar um usuário de teste na página inicial em qualquer perfil e fazer o acesso e validar cada funcionalidade.
