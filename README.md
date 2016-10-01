@@ -7,4 +7,4 @@ SisCoPTE (Sistema de Controle de Posse Temporária de Equipamentos) foi desenvol
 Para instalar o SisCoPTE, basta baixar arquivos-fonte e fazer upload deles num servidor WEB com suporte a PHP onde o serviço será rodado.
 
 ## Versão de Teste Online
-O sistema pode ser acessado e testado online no endereço http://siscopte.byethost7.com/php/logon.php. Nessa versão de teste, é possível criar um usuário de teste na página inicial em qualquer perfil e fazer o acesso e validar cada funcionalidade.
+O sistema pode ser acessado e testado online no endereço http://siscopte.byethost7.com/. Nessa versão de teste, é possível criar um usuário de teste na página inicial em qualquer perfil e fazer o acesso e validar cada funcionalidade.
